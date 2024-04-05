@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("students")
 public class StudentController {
 
-    @Autowired
-    StudentService studentService;
+
+    StudentService studentService = new StudentService();
 
     @PostMapping("/add-student")
     public ResponseEntity<String> addStudent(@RequestBody Student student){
@@ -37,22 +37,38 @@ public class StudentController {
 
     @PutMapping("/add-student-teacher-pair")
     public ResponseEntity<String> addStudentTeacherPair(@RequestParam String student, @RequestParam String teacher){
+        try {
             studentService.createStudentTeacherPair(student, teacher);
-        return new ResponseEntity<>("New student-teacher pair added successfully", HttpStatus.CREATED);
+            return new ResponseEntity<>("New student-teacher pair added successfully", HttpStatus.CREATED);
+        }catch (StudentNotFoundException ex){
+            return new ResponseEntity<>("Invalid  student name"+student,HttpStatus.NOT_FOUND);
+        }catch(TeacherNotFoundException ex){
+            return new ResponseEntity<>("Invalid teacher name"+teacher,HttpStatus.NOT_FOUND);
+        }catch (RuntimeException ex){
+            return new ResponseEntity<>("other exception",HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/get-student-by-name/{name}")
     public ResponseEntity<Student> getStudentByName(@PathVariable String name){
-       Student student = studentService.findStudent(name); // Assign student by calling service layer method
+        try{
+            Student student = studentService.findStudent(name); // Assign student by calling service layer method
+            return new ResponseEntity<>(student, HttpStatus.CREATED);
+        }catch (StudentNotFoundException ex){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
 
-        return new ResponseEntity<>(student, HttpStatus.CREATED);
     }
 
     @GetMapping("/get-teacher-by-name/{name}")
     public ResponseEntity<Teacher> getTeacherByName(@PathVariable String name){
-        Teacher teacher = studentService.findTeacher(name); // Assign student by calling service layer method
+        try {
+            Teacher teacher = studentService.findTeacher(name);// Assign student by calling service layer method
+            return new ResponseEntity<>(teacher, HttpStatus.CREATED);
+        }catch (TeacherNotFoundException ex){
+            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        }
 
-        return new ResponseEntity<>(teacher, HttpStatus.CREATED);
     }
 
     @GetMapping("/get-students-by-teacher-name/{teacher}")
