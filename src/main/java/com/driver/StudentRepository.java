@@ -18,35 +18,26 @@ public class StudentRepository {
     }
 
     public void saveStudent(Student student){
-        if (student != null && !studentMap.containsKey(student.getName())) {
             studentMap.put(student.getName(), student);
-        }
     }
 
     public void saveTeacher(Teacher teacher){
-        if (teacher != null && !teacherMap.containsKey(teacher.getName())) {
             teacherMap.put(teacher.getName(), teacher);
-        }
+
     }
 
     public void saveStudentTeacherPair(String student, String teacher){
-        if(studentMap.containsKey(student) && teacherMap.containsKey(teacher)) {
-            List<String> students = teacherStudentMapping.getOrDefault(teacher, new ArrayList<>());
-            students.add(student);
-            teacherStudentMapping.put(teacher, students);
+        if(!teacherStudentMapping.containsKey(teacher)) {
+            teacherStudentMapping.put(teacher, new ArrayList<>());
         }
+        teacherStudentMapping.get(teacher).add(student);
     }
 
     public Student findStudent(String student){
-        // your code goes here
-        if(studentMap.containsKey(student))
             return studentMap.get(student);
-
-        return null;
     }
 
     public Teacher findTeacher(String teacher){
-        // your code goes here
         return teacherMap.get(teacher);
     }
 
@@ -58,8 +49,10 @@ public class StudentRepository {
 
     public List<String> findAllStudents() {
         List<String> allStudents = new ArrayList<>();
-
-        return new ArrayList<>(studentMap.keySet());
+        for (String st : studentMap.keySet()){
+            allStudents.add(st);
+        }
+        return allStudents;
     }
 
     public void deleteTeacher(String teacher){
@@ -70,7 +63,8 @@ public class StudentRepository {
 
     public void deleteAllTeachers(){
         // your code goes here
-        teacherStudentMapping.clear();
-        teacherMap.clear();
+        for (String tName : teacherMap.keySet()){
+            deleteTeacher(tName);
+        }
     }
 }
