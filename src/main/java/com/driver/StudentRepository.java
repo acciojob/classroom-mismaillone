@@ -57,20 +57,26 @@ public class StudentRepository {
 
     public void deleteTeacher(String teacher){
         // your code goes here
-        for (String teacherName : teacherMap.keySet()) {
-            List<String> students = teacherStudentMapping.get(teacherName);
-            for (String studentId : students) {
-                studentMap.remove(studentId);
-            }
-        }
-        teacherStudentMapping.remove(teacher);
         teacherMap.remove(teacher);
+
+        List<String> al = teacherStudentMapping.remove(teacher);
+        for(int i=0; i<al.size(); i++) {
+            String temp = al.get(i);
+            studentMap.remove(temp);
+        }
+
     }
 
     public void deleteAllTeachers(){
         // your code goes here
-        for (String tName : teacherMap.keySet()){
-            deleteTeacher(tName);
+        for(String k: teacherStudentMapping.keySet()) {
+            teacherMap.remove(k);
+            List<String> al = teacherStudentMapping.remove(k);
+            for(String p: al) {
+                if(studentMap.containsKey(p)) {
+                    studentMap.remove(p);
+                }
+            }
         }
     }
 }
